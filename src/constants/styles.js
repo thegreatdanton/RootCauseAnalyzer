@@ -40,6 +40,7 @@ const customStyles = StyleSheet.create({
   searchContainer: {
     backgroundColor: 'transparent',
     marginHorizontal: 10,
+    borderColor: "transparent"
     // position: 'absolute',
   },
   searchInputContainer: {

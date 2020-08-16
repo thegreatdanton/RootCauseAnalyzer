@@ -8,6 +8,7 @@ import {
   ScrollView,
   Platform,
   Dimensions,
+  Keyboard,
 } from 'react-native';
 import { TextInput } from 'react-native-gesture-handler';
 import { Text, Icon } from 'react-native-elements';
@@ -185,6 +186,7 @@ const AddEventScreen = ({ route, navigation }) => {
               clearButtonMode="unless-editing"
               selectionColor="black"
               autoFocus
+              onBlur = {Keyboard.dismiss}
             />
           </View>
         </View>

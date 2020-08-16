@@ -145,6 +145,7 @@ const GoogleDriveUtility = () => {
     } catch (error) {
       if (error.code === statusCodes.SIGN_IN_CANCELLED) {
         // user cancelled the login flow
+        setIsSigninInProgress(false);
         console.log(error);
       } else if (error.code === statusCodes.IN_PROGRESS) {
         // operation (e.g. sign in) is in progress already
@@ -154,9 +155,11 @@ const GoogleDriveUtility = () => {
         error.code === statusCodes.PLAY_SERVICES_NOT_AVAILABLE
       ) {
         // play services not available or outdated
+        setIsSigninInProgress(false);
         console.log(error);
       } else {
         // some other error happened
+        setIsSigninInProgress(false);
         console.log(error);
       }
     }

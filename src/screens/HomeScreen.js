@@ -1,10 +1,5 @@
-import React, { useContext, useState } from 'react';
-import {
-  View,
-  StyleSheet,
-  TouchableOpacity,
-  FlatList,
-} from 'react-native';
+import React, { useContext, useState, useRef } from 'react';
+import { View, StyleSheet, TouchableOpacity } from 'react-native';
 import { useFocusEffect, useTheme } from '@react-navigation/native';
 import { Text, Card, Icon, SearchBar } from 'react-native-elements';
 import { SwipeListView } from 'react-native-swipe-list-view';
@@ -16,11 +11,13 @@ import Category from '../components/Category';
 import Colors from '../constants/colors';
 import EmptyEvents from '../components/EmptyEvents';
 import { showMessage } from 'react-native-flash-message';
+import AlertPro from 'react-native-alert-pro';
 
 const HomeScreen = ({ navigation }) => {
   const { state, deleteEvent, getEvents, editEvent } = useContext(
     EventContext,
   );
+  const alertRef = useRef();
   const { colors } = useTheme();
   const [events, setEvents] = useState([]);
   const [searchResults, setSearchResults] = useState(null);
@@ -28,6 +25,8 @@ const HomeScreen = ({ navigation }) => {
   const [showSearch, setShowSearch] = useState(false);
   const [showSearchButton, setShowSearchButton] = useState(false);
   const [done, setDone] = useState(false);
+  const [eventId, setEventId] = useState(null);
+  const [eventTitle, setEventTitle] = useState('');
 
   useFocusEffect(
     React.useCallback(() => {
@@ -71,7 +70,7 @@ const HomeScreen = ({ navigation }) => {
   };
 
   const clearSearch = () => {
-    if(searchResults){
+    if (searchResults) {
       setSearchResults(null);
       setShowSearch(false);
     } else {
@@ -79,14 +78,16 @@ const HomeScreen = ({ navigation }) => {
       setShowSearch(!showSearch);
       setSearchText('');
     }
-   
-   
   };
 
   const renderEmptyList = () => {
     return <EmptyEvents />;
   };
 
+  const deleteEventFromList = (id) => {
+    events.filter((key) => key.id === id);
+    deleteEvent(id);
+  };
   return (
     <View style={styles.containerStyle}>
       {showSearch && (
@@ -126,7 +127,9 @@ const HomeScreen = ({ navigation }) => {
           }
           extraData={searchResults}
           scrollEnabled
-          ListEmptyComponent={searchResults ? null: renderEmptyList()}
+          ListEmptyComponent={
+            searchResults ? null : renderEmptyList()
+          }
           renderItem={(data) => {
             return (
               <View>
@@ -149,9 +152,10 @@ const HomeScreen = ({ navigation }) => {
                     containerStyle={[
                       styles.cardStyle,
                       {
-                        backgroundColor: data
-                          ? data.item.color
-                          : 'transparent',
+                        backgroundColor:
+                          data && data.item.color
+                            ? data.item.color
+                            : 'transparent',
                       },
                     ]}
                     wrapperStyle={styles.cardContent}
@@ -203,8 +207,9 @@ const HomeScreen = ({ navigation }) => {
               <View style={styles.rowBack}>
                 <TouchableOpacity
                   onPress={() => {
-                    events.filter((key) => key.id === data.item.id);
-                    deleteEvent(data.item.id);
+                    setEventId(data.item.id);
+                    setEventTitle(data.item.eventTitle);
+                    alertRef.current.open();
                   }}
                   style={styles.deleteView}
                 >
@@ -335,7 +340,7 @@ const HomeScreen = ({ navigation }) => {
             name="search"
             type="font-awesome"
             color="#10375C"
-            size={25}
+            size={22}
             onPress={() => clearSearch()}
           />
         )}
@@ -346,7 +351,7 @@ const HomeScreen = ({ navigation }) => {
           name="plus"
           type="font-awesome"
           color="#10375C"
-          size={25}
+          size={22}
           onPress={() =>
             navigation.navigate('AddEvent', {
               name: '',
@@ -356,6 +361,61 @@ const HomeScreen = ({ navigation }) => {
           }
         />
       </View>
+      <AlertPro
+        ref={alertRef}
+        onConfirm={() => {
+          deleteEventFromList(eventId);
+          alertRef.current.close();
+        }}
+        title="Delete Confirmation"
+        message={`Are you sure to delete ${eventTitle}?`}
+        textCancel="Cancel"
+        textConfirm="Delete"
+        onCancel={() => alertRef.current.close()}
+        customStyles={{
+          mask: {
+            backgroundColor: 'rgba(0,0,0,0.5)',
+          },
+          container: {
+            borderWidth: 1,
+            borderColor: colors.card,
+            shadowColor: colors.text,
+            shadowOpacity: 0.1,
+            shadowRadius: 10,
+            borderRadius: 10,
+            backgroundColor: colors.primary,
+            elevation: 5,
+          },
+          buttonCancel: {
+            backgroundColor: Colors.secondary,
+            borderColor: Colors.secondary,
+            borderWidth: 2,
+            borderRadius: 10,
+          },
+          buttonConfirm: {
+            backgroundColor: Colors.secondary,
+            borderColor: Colors.errorBackground,
+            borderWidth: 2,
+            borderRadius: 10,
+          },
+          title: {
+            fontFamily: 'SFUIText-Bold',
+            color: colors.text,
+          },
+          message: {
+            fontFamily: 'SFUIText-Medium',
+            color: colors.text,
+          },
+          textCancel: {
+            fontFamily: 'SFUIText-Medium',
+            color: Colors.white,
+          },
+          textConfirm: {
+            fontFamily: 'SFUIText-Medium',
+            color: Colors.white,
+          },
+        }}
+      />
     </View>
   );
 };

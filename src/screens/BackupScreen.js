@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { View, StyleSheet, PermissionsAndroid } from 'react-native';
 import { useFocusEffect } from '@react-navigation/native';
 import GoogleDriveUtility from '../components/GoogleDriveUtility';
@@ -19,6 +19,8 @@ const BackupScreen = ({ route, navigation }) => {
   const { title } = route.params;
   var headerName = title;
 
+  const [backupAvailable, setBackupAvailable] = useState(false);
+
   useFocusEffect(
     React.useCallback(() => {
       navigation.setOptions({
@@ -30,7 +32,6 @@ const BackupScreen = ({ route, navigation }) => {
           color: colors.text,
         },
       });
-      checkPermission();
     }, []),
   );
 
@@ -116,18 +117,24 @@ const BackupScreen = ({ route, navigation }) => {
     }
   }
 
-  const saveToDeviceStorage = () => {
-    var path = RNFS.DocumentDirectoryPath + '/eventData.json';
-    var events = createFile();
-    RNFS.writeFile(path, events, 'utf8')
+  const saveToDeviceStorage =  () => {
+    checkPermission();
+    var path =  RNFS.ExternalDirectoryPath + '/eventData.json';
+     var events = createFile();
+    // console.log("events", JSON.parse(events));
+     RNFS.writeFile(path, events.toString(), 'utf8')
       .then((success) => {
-        console.log('Backup Success');
+        setBackupAvailable(true);
+        showMessage({
+          message: 'Backup Successful',
+          type: 'success',
+        });
       })
       .catch((error) => console.log(error.message));
   };
 
   const readFromDeviceStorage = () => {
-    var path = RNFS.DocumentDirectoryPath + '/eventData.json';
+    var path = RNFS.ExternalDirectoryPath + '/eventData.json';
 
     RNFS.readDir(RNFS.DocumentDirectoryPath)
       .then((result) => {
@@ -145,8 +152,6 @@ const BackupScreen = ({ route, navigation }) => {
         return 'no file';
       })
       .then((contents) => {
-        console.log('file');
-        console.log(contents);
         var parsedResult = JSON.parse(contents);
         var final = JSON.parse(parsedResult);
         console.log(final);
@@ -189,13 +194,15 @@ const BackupScreen = ({ route, navigation }) => {
   };
 
   const deleteBackup = () => {
-    var path = RNFS.DocumentDirectoryPath + '/eventData.json';
+    var path = RNFS.ExternalDirectoryPath + '/eventData.json';
     return RNFS.unlink(path)
       .then(() => {
+        setBackupAvailable(false);
         showMessage({
-          message: 'Restore Successful',
+          message: 'Deleted Succesfully',
           type: 'success',
         });
+
       })
       .catch((err) => {
         showMessage({
@@ -207,26 +214,27 @@ const BackupScreen = ({ route, navigation }) => {
 
   return (
     <View style={styles.container}>
-      <Text style={[styles.text, { color: colors.text }]}>
+      <Text style={[styles.text, { color: colors.text, fontFamily: 'SFUIText-Medium'  }]}>
         Cloud Backup
       </Text>
       <View style={styles.cloudBackup}>
         <GoogleDriveUtility />
       </View>
-      <Divider style={styles.divider} />
-      <Text
+      {/* <Divider style={styles.divider} /> */}
+      {/* <Text
         style={[
           styles.text,
           { color: colors.text, fontFamily: 'SFUIText-Medium' },
         ]}
       >
-        Local Backup
-      </Text>
-      <View style={{ backgroundColor: 'transparent' }}>
+        Backup to device storage
+      </Text> */}
+      {/* <View style={{ backgroundColor: 'transparent' }}>
         <View
           style={{
             flexDirection: 'row',
-            justifyContent: 'space-evenly',
+            justifyContent: "space-around",
+           
           }}
         >
           <TouchableOpacity
@@ -236,17 +244,13 @@ const BackupScreen = ({ route, navigation }) => {
               { backgroundColor: colors.primary },
             ]}
           >
-            {/* <Icon
-            name="file-export"
-            type="font-awesome"
-            color="#517fa4"
-          /> */}
             <Text style={[styles.text, { color: colors.text }]}>
-              Local Backup
+              Backup data
             </Text>
           </TouchableOpacity>
 
-          <TouchableOpacity
+         {backupAvailable && 
+           <TouchableOpacity
             onPress={() => readFromDeviceStorage()}
             style={[
               styles.localButton,
@@ -254,34 +258,35 @@ const BackupScreen = ({ route, navigation }) => {
             ]}
           >
             <Text style={[styles.text, { color: colors.text }]}>
-              Local Restore
+              Restore data
             </Text>
           </TouchableOpacity>
+          }
         </View>
-        <TouchableOpacity
+        {backupAvailable && <TouchableOpacity
           onPress={() => deleteBackup()}
           style={[
             styles.localButton,
             { backgroundColor: colors.primary },
           ]}
         >
-          {/* <Icon name="log-out-outline" type="ionicon" /> */}
+         
           <Text
             style={[
               styles.text,
               { color: colors.text, textAlign: 'center' },
             ]}
           >
-            Delete Local Backup
+            Delete
           </Text>
-        </TouchableOpacity>
-      </View>
+        </TouchableOpacity>}
+      </View> */}
     </View>
   );
 };
 
 const styles = StyleSheet.create({
-  container: { marginHorizontal: 20 },
+  container: { marginHorizontal: 20, flex:1 },
   cloudBackup: {
     borderRadius: 10,
     // borderWidth: 2,

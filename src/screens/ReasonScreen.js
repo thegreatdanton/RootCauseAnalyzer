@@ -29,6 +29,7 @@ import {
 import DateTimePicker from '@react-native-community/datetimepicker';
 import ImagePicker from 'react-native-image-picker';
 import Colors from '../constants/colors';
+import AlertPro from 'react-native-alert-pro';
 
 const window = Dimensions.get('window');
 
@@ -48,10 +49,11 @@ const ReasonScreen = ({ route, navigation }) => {
   const [modalVisible, setModalVisible] = useState(false);
   const [] = useState(0);
   const [image, setImage] = useState(null);
+  const [deletedValue, setDeletedValue] = useState('');
 
   const { id, reason, addingReason } = route.params;
   const event = state.find((item) => item.id === id);
-  const plusRef = useRef();
+  const alertRef = useRef();
   const modalRef = useRef();
 
   var {
@@ -204,6 +206,33 @@ const ReasonScreen = ({ route, navigation }) => {
     console.log(item);
   };
 
+  const deleteReasonFromList = (value) => {
+    var list = reasons.filter((item) => item.description !== value);
+    reasons = list;
+    addReason(
+      id,
+      eventTitle,
+      eventDescription,
+      date,
+      category,
+      color,
+      reasons,
+      starred,
+      done,
+      () =>
+        navigation.navigate('EventDetail', {
+          id,
+          eventTitle,
+          eventDescription,
+          date,
+          category,
+          color,
+          reasons,
+          starred,
+          done,
+        }),
+    );
+  };
   return (
     <View
       style={[
@@ -317,33 +346,8 @@ const ReasonScreen = ({ route, navigation }) => {
         {!addingReason && (
           <TouchableOpacity
             onPress={() => {
-              var list = reasons.filter(
-                (item) => item.description !== reason.description,
-              );
-              reasons = list;
-              addReason(
-                id,
-                eventTitle,
-                eventDescription,
-                date,
-                category,
-                color,
-                reasons,
-                starred,
-                done,
-                () =>
-                  navigation.navigate('EventDetail', {
-                    id,
-                    eventTitle,
-                    eventDescription,
-                    date,
-                    category,
-                    color,
-                    reasons,
-                    starred,
-                    done,
-                  }),
-              );
+              setDeletedValue(reason.description);
+              alertRef.current.open();
             }}
             style={styles.option}
           >
@@ -458,9 +462,16 @@ const ReasonScreen = ({ route, navigation }) => {
             }}
           />
           <View style={styles.noteContainer}>
-            <Text style={[styles.noteTextHeader, {color: colors.text}]}>Note on Attachments</Text>
-            <Text style={[styles.noteText,{color: colors.text}]}>Attachments are indexed from storage and will be removed if deleted from storage.</Text>
-         </View>
+            <Text
+              style={[styles.noteTextHeader, { color: colors.text }]}
+            >
+              Note on Attachments
+            </Text>
+            <Text style={[styles.noteText, { color: colors.text }]}>
+              Attachments are indexed from storage and will be removed
+              if deleted from storage.
+            </Text>
+          </View>
         </View>
       )}
       <Modal
@@ -500,6 +511,61 @@ const ReasonScreen = ({ route, navigation }) => {
           </View>
         </View>
       </Modal>
+      <AlertPro
+        ref={alertRef}
+        onConfirm={() => {
+          deleteReasonFromList(deletedValue);
+          alertRef.current.close();
+        }}
+        title="Delete Confirmation"
+        message="Are you sure to delete the reason ?"
+        textCancel="Cancel"
+        textConfirm="Delete"
+        onCancel={() => alertRef.current.close()}
+        customStyles={{
+          mask: {
+            backgroundColor: 'rgba(0,0,0,0.5)',
+          },
+          container: {
+            borderWidth: 1,
+            borderColor: colors.card,
+            shadowColor: colors.text,
+            shadowOpacity: 0.1,
+            shadowRadius: 10,
+            borderRadius: 10,
+            backgroundColor: colors.primary,
+            elevation: 5,
+          },
+          buttonCancel: {
+            backgroundColor: 'transparent',
+            borderColor: Colors.secondary,
+            borderWidth: 2,
+            borderRadius: 10,
+          },
+          buttonConfirm: {
+            backgroundColor: 'transparent',
+            borderColor: Colors.errorBackground,
+            borderWidth: 2,
+            borderRadius: 10,
+          },
+          title: {
+            fontFamily: 'SFUIText-Bold',
+            color: colors.text,
+          },
+          message: {
+            fontFamily: 'SFUIText-Medium',
+            color: colors.text,
+          },
+          textCancel: {
+            fontFamily: 'SFUIText-Medium',
+            color: colors.text,
+          },
+          textConfirm: {
+            fontFamily: 'SFUIText-Medium',
+            color: colors.text,
+          },
+        }}
+      />
     </View>
   );
 };
@@ -596,21 +662,21 @@ const styles = StyleSheet.create({
     backgroundColor: 'transparent',
     borderColor: 'transparent',
   },
-  noteText:{
+  noteText: {
     fontFamily: 'SFUIText-Regular',
     fontSize: 18,
-    textAlign:"justify"
+    textAlign: 'justify',
   },
-  noteTextHeader:{
-    fontFamily:" SFUIText-Bold",
-    fontSize:20,
-    textAlign:"center"
+  noteTextHeader: {
+    fontFamily: ' SFUIText-Bold',
+    fontSize: 20,
+    textAlign: 'center',
   },
-  noteContainer:{
-    justifyContent:"center",
-    alignItems:"center",
-    margin:10,
-  }
+  noteContainer: {
+    justifyContent: 'center',
+    alignItems: 'center',
+    margin: 10,
+  },
 });
 
 export default ReasonScreen;
