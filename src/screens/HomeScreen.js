@@ -133,7 +133,7 @@ const HomeScreen = ({ navigation }) => {
           renderItem={(data) => {
             return (
               <View>
-                <TouchableOpacity
+                {data.length !==0 && (<TouchableOpacity
                   activeOpacity={1}
                   onPress={() => {
                     navigation.navigate('EventDetail', {
@@ -153,7 +153,7 @@ const HomeScreen = ({ navigation }) => {
                       styles.cardStyle,
                       {
                         backgroundColor:
-                          data && data.item.color
+                          data && data.item
                             ? data.item.color
                             : 'transparent',
                       },
@@ -162,9 +162,9 @@ const HomeScreen = ({ navigation }) => {
                   >
                     <View style={{ flexDirection: 'row' }}>
                       <View style={styles.titleView}>
-                        <Text style={styles.titleStyle}>
+                       {data.item && (<Text style={styles.titleStyle}>
                           {data.item.eventTitle}
-                        </Text>
+                        </Text>)}
                       </View>
                       {/* <TouchableOpacity
                       onPress={() => deleteEvent(data.item.id)}
@@ -198,7 +198,7 @@ const HomeScreen = ({ navigation }) => {
                       <DateTime eventDate={data.item.date} />
                     </View>
                   </Card>
-                </TouchableOpacity>
+                </TouchableOpacity>)}
               </View>
             );
           }}
@@ -257,79 +257,6 @@ const HomeScreen = ({ navigation }) => {
           rightOpenValue={-70}
           leftOpenValue={70}
         />
-        {/* <FlatList
-          data={
-            searchResults.length !== 0
-              ? searchResults.sort(function (a, b) {
-                  return new Date(b.date) - new Date(a.date);
-                })
-              : events.sort(function (a, b) {
-                  return new Date(b.date) - new Date(a.date);
-                })
-          }
-          extraData={searchResults}
-          keyExtractor={(event) => event.id.toString()}
-          scrollEnabled
-          ListEmptyComponent={renderEmptyList()}
-          renderItem={({ item }) => {
-            return (
-              <TouchableOpacity
-                activeOpacity={1}
-                onPress={() => {
-                  navigation.navigate('EventDetail', {
-                    id: item.id,
-                    eventTitle: item.eventTitle,
-                    date: item.date,
-                    category: item.category,
-                    color: item.color,
-                    reasons: item.reasons,
-                    starred: item.starred,
-                    done: item.done,
-                  });
-                }}
-              >
-                <Card
-                  containerStyle={[
-                    styles.cardStyle,
-                    { backgroundColor: item.color },
-                  ]}
-                  wrapperStyle={styles.cardContent}
-                >
-                  <View style={{ flexDirection: 'row' }}>
-                    <View style={styles.titleView}>
-                      <Text style={styles.titleStyle}>
-                        {item.eventTitle}
-                      </Text>
-                      {item.starred && (
-                        <Icon
-                          name="star"
-                          type="font-awesome"
-                          color={Colors.lightBlack}
-                          size={20}
-                          containerStyle={styles.star}
-                        />
-                      )}
-                    </View>
-                    <TouchableOpacity
-                      onPress={() => deleteEvent(item.id)}
-                      style={styles.deleteView}
-                    >
-                      <Icon
-                        name="trash-o"
-                        size={20}
-                        color={Colors.primary}
-                      />
-                    </TouchableOpacity>
-                  </View>
-                  <View style={customStyles.optionsContainer}>
-                    <Category name={item.category} />
-                    <DateTime eventDate={item.date} />
-                  </View>
-                </Card>
-              </TouchableOpacity>
-            );
-          }}
-        /> */}
       </View>
       <View style={styles.buttonView}>
         {showSearchButton && (
@@ -340,7 +267,7 @@ const HomeScreen = ({ navigation }) => {
             name="search"
             type="font-awesome"
             color="#10375C"
-            size={22}
+            size={25}
             onPress={() => clearSearch()}
           />
         )}
@@ -351,7 +278,7 @@ const HomeScreen = ({ navigation }) => {
           name="plus"
           type="font-awesome"
           color="#10375C"
-          size={22}
+          size={25}
           onPress={() =>
             navigation.navigate('AddEvent', {
               name: '',

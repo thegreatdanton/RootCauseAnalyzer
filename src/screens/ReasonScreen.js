@@ -307,7 +307,7 @@ const ReasonScreen = ({ route, navigation }) => {
           testID="dateTimePicker"
           value={new Date(newDate)}
           mode={mode}
-          display="spinner"
+          display="default"
           onChange={onChange}
         />
       )}
