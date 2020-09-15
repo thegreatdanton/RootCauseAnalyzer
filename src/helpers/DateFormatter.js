@@ -9,5 +9,5 @@ export function timeFormat(date) {
 }
 
 export function datetimeFormat(date) {
-  return moment(date).format('HH:mm, MMMM Do, YY');
+  return moment(date).format('HH:mm, MMM Do, YY');
 }

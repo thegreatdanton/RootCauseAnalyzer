@@ -68,7 +68,6 @@ const AddEventScreen = ({ route, navigation }) => {
       // },
     });
     if (id) {
-      console.log(description);
       setEventTitle(name);
       seteventDescription(description);
       setDate(new Date(eventDate));
@@ -186,7 +185,7 @@ const AddEventScreen = ({ route, navigation }) => {
               clearButtonMode="unless-editing"
               selectionColor="black"
               autoFocus
-              onBlur = {Keyboard.dismiss}
+              onBlur={Keyboard.dismiss}
             />
           </View>
         </View>

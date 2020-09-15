@@ -14,7 +14,12 @@ const newFeatures = [
   'and many more',
 ];
 const issues = ['N/A'];
-const upcoming = ['1. Mark Event as done,', '2. Animations,', '3. Local Backup and Restore,', '4. Help guide'];
+const upcoming = [
+  '1. Mark Event as done,',
+  '2. Animations,',
+  '3. Local Backup and Restore,',
+  '4. Help guide',
+];
 const NewScreen = ({ route, navigation }) => {
   const { colors } = useTheme();
   const { title } = route.params;
